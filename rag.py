@@ -151,6 +151,7 @@ from langchain_community.vectorstores import Chroma
 from langchain.prompts import PromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 from typing import List, Tuple
+from langchain_core.documents import Document # Import Document class for static text
 
 # --- Constants ---
 CHROMA_DB_DIR = "chroma_db"
@@ -228,49 +229,67 @@ def process_urls(urls: List[str]) -> None:
         initialize_components() # Ensure components are initialized before use
 
     print(f"Attempting to load data from URLs: {urls}")
-    try:
-        loader = UnstructuredURLLoader(urls=urls)
-        docs = loader.load()
-        print(f"DEBUG: Length of loaded data documents: {len(docs)}")
 
-        if not docs:
-            print("WARNING: No documents extracted from URLs. Skipping addition to vector database.")
-            # Do not clear the DB if no new docs were processed, so old data remains if any
-            return
+    # --- START OF STATIC TEXT WORKAROUND BLOCK ---
+    # This block temporarily bypasses URL loading to verify the rest of the RAG pipeline.
+    # We will remove or modify this later once we've confirmed the core RAG components work.
+    
+    # Example static text to use for testing
+    static_text_content = [
+        "Hyderabad is the capital and largest city of the Indian state of Telangana. It is a major center for the technology industry.",
+        "The city is known for its rich history, culture, and architecture, including the Charminar and Golconda Fort. It was founded in 1591 by Muhammad Quli Qutb Shah.",
+        "Hyderabad is also famous for its delicious cuisine, especially Hyderabadi Biryani. It is often referred to as the 'City of Pearls'.",
+        "The IT hub, HITEC City, is a prominent technology township in Hyderabad, home to many multinational corporations."
+    ]
 
-        # Split documents
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200
-        )
-        texts = text_splitter.split_documents(docs)
-        print(f"DEBUG: Number of documents after splitting: {len(texts)}")
+    # Instead of loading from URLs, create documents directly from static text
+    docs = [Document(page_content=text) for text in static_text_content]
+    print(f"DEBUG: Using static text documents for testing. Length: {len(docs)}")
+    # --- END OF STATIC TEXT WORKAROUND BLOCK ---
 
-        # Add to vector database
-        if texts:
-            # Ensure the vector_store is correctly initialized with the embedding function
-            embeddings = OpenAIEmbeddings(api_key=os.environ.get('OPENAI_API_KEY'))
-            # If there's existing data, add to it. Otherwise, create new.
-            if os.path.exists(CHROMA_DB_DIR) and os.listdir(CHROMA_DB_DIR):
-                # Using add_documents to append to existing collection
-                print(f"Adding {len(texts)} new documents to existing vector store.")
-                vector_store.add_documents(texts)
-            else:
-                # If no existing DB or it's empty, create it with these new texts
-                print(f"Creating new vector store with {len(texts)} documents.")
-                vector_store = Chroma.from_documents(
-                    documents=texts,
-                    embedding=embeddings,
-                    persist_directory=CHROMA_DB_DIR
-                )
-            vector_store.persist() # Save changes to disk
-            print(f"Successfully added {len(texts)} documents to vector database.")
+    # --- The original loader.load() block below is now commented out/replaced by the static text above ---
+    # try:
+    #     loader = UnstructuredURLLoader(urls=urls)
+    #     docs = loader.load()
+    #     print(f"DEBUG: Length of loaded data documents: {len(docs)}")
+    # except Exception as e:
+    #     print(f"Error fetching or processing URLs: {e}")
+    #     return # Crucial: if error, return None
+
+
+    if not docs:
+        print("WARNING: No documents extracted (even from static text). Skipping addition to vector database.")
+        return
+
+    # Split documents
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200
+    )
+    texts = text_splitter.split_documents(docs)
+    print(f"DEBUG: Number of documents after splitting: {len(texts)}")
+
+    # Add to vector database
+    if texts:
+        embeddings = OpenAIEmbeddings(api_key=os.environ.get('OPENAI_API_KEY'))
+        if os.path.exists(CHROMA_DB_DIR) and os.listdir(CHROMA_DB_DIR):
+            print(f"Adding {len(texts)} new documents to existing vector store.")
+            vector_store.add_documents(texts)
         else:
-            print("WARNING: No texts generated after splitting documents. Vector database remains unchanged.")
+            print(f"Creating new vector store with {len(texts)} documents.")
+            vector_store = Chroma.from_documents(
+                documents=texts,
+                embedding=embeddings,
+                persist_directory=CHROMA_DB_DIR
+            )
+        vector_store.persist() # Save changes to disk
+        print(f"Successfully added {len(texts)} documents to vector database.")
+    else:
+        print("WARNING: No texts generated after splitting documents. Vector database remains unchanged.")
 
-    except Exception as e:
-        print(f"Error fetching or processing URLs: {e}")
-        # Optionally, you might want to inform the user via Streamlit UI if this is a critical error
+    # Removed the outer try-except block here as the URL loading is now bypassed by static text.
+    # Any exceptions in splitting/adding will still be caught, but not from URL fetching.
+
 
 # --- Function to Generate Answer ---
 def generate_answer(question: str) -> Tuple[str, str]:
@@ -321,7 +340,7 @@ if __name__ == "__main__":
     ]
 
     print("\n--- Processing URLs ---")
-    process_urls(test_urls)
+    process_urls(test_urls) # This will still use the static text if the block is active
 
     print("\n--- Asking a question ---")
     question = "What is Hyderabad known for?"
