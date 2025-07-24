@@ -31,7 +31,7 @@ def initialize_components():
             model_name=EMBEDDING_MODEL,
             model_kwargs={"trust_remote_code": True}
         )
-
+        VECTORSTORE_DIR.mkdir(parents=True, exist_ok=True)
         vector_store = Chroma(
             collection_name=COLLECTION_NAME,
             embedding_function=ef,
