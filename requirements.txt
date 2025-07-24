@@ -4,8 +4,8 @@ unstructured==0.15.0
 tiktoken==0.7.0
 langchain-chroma==0.1.4
 langchain-groq==0.2.0
-langchain-community==0.3.27 # Updated version
+langchain-community==0.3.27
 protobuf==5.28.2
-langchain-huggingface==0.0.3
+langchain-huggingface==0.3.1  # UPDATED!
 chromadb==0.5.11
-langchain-core>=0.3.0,<0.4.0
+langchain-core>=0.3.66,<0.4.0 # Narrowed range to satisfy langchain-community
