@@ -1,9 +1,9 @@
-import sys
-__import__('pysqlite3')
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# import sys
+# __import__('pysqlite3')
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 from uuid import uuid4
-# from dotenv import load_dotenv # REMOVED/COMMENTED OUT
+from dotenv import load_dotenv # REMOVED/COMMENTED OUT
 from pathlib import Path
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain_community.document_loaders import UnstructuredURLLoader
@@ -13,6 +13,9 @@ from langchain_groq import ChatGroq
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 
 import os # Keep this for the debug print, can be removed later if desired
+
+load_dotenv()
+
 
 # Constants
 CHUNK_SIZE = 1000
@@ -27,7 +30,7 @@ vector_store = None
 # WARNING: Hardcoding API keys is generally NOT recommended for production.
 # This is a temporary workaround because Streamlit Cloud secrets are not being
 # injected into environment variables for your app.
-GROQ_API_KEY_HARDCODED = "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"
+
 
 def initialize_components():
     global llm, vector_store
@@ -39,7 +42,7 @@ def initialize_components():
             model="llama-3.3-70b-versatile",
             temperature=0.9,
             max_tokens=500,
-            api_key=GROQ_API_KEY_HARDCODED # Pass the hardcoded key directly
+          
         )
 
     if vector_store is None:
@@ -104,19 +107,19 @@ def generate_answer(question):
     return result["answer"],sources
 
 
-if __name__ == "__main__":
-    urls = [
-        "https://www.cricbuzz.com/live-cricket-scores/105778/ind-vs-eng-4th-test-india-tour-of-england-2025",
-        "https://indianexpress.com/section/sports/cricket/live-score/england-vs-india-4th-test-live-score-full-scorecard-highlights-anderson-tendulkar-trophy-2025-enin07232025250828/" # Corrected URL
-    ]
+# if __name__ == "__main__":
+#     urls = [
+#         "https://www.cricbuzz.com/live-cricket-scores/105778/ind-vs-eng-4th-test-india-tour-of-england-2025",
+#         "https://indianexpress.com/section/sports/cricket/live-score/england-vs-india-4th-test-live-score-full-scorecard-highlights-anderson-tendulkar-trophy-2025-enin07232025250828/" # Corrected URL
+#     ]
 
-    # This part assumes you're running it outside a Streamlit UI (e.g., in a script)
-    # If this is part of your Streamlit app's main file, this block might be handled differently
-    # in the Streamlit app's control flow (e.g., triggered by a button click).
-    # For now, this will execute process_urls immediately on app startup in Streamlit.
-    for status in process_urls(urls):
-        print(status)
+#     # This part assumes you're running it outside a Streamlit UI (e.g., in a script)
+#     # If this is part of your Streamlit app's main file, this block might be handled differently
+#     # in the Streamlit app's control flow (e.g., triggered by a button click).
+#     # For now, this will execute process_urls immediately on app startup in Streamlit.
+#     for status in process_urls(urls):
+#         print(status)
 
-    answer, sources = generate_answer("Tell me the two teams playing today")
-    print(f"Answer: {answer}")
-    print(f"Sources: {sources}")
+#     answer, sources = generate_answer("Tell me the two teams playing today")
+#     print(f"Answer: {answer}")
+#     print(f"Sources: {sources}")
