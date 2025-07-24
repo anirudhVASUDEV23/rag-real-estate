@@ -39,7 +39,8 @@
 
 
 import streamlit as st
-from rag import process_urls, generate_answer, initialize_components # Import initialize_components too
+# Import initialize_components as well, since it's now called at startup
+from rag import process_urls, generate_answer, initialize_components 
 
 st.title("Real Estate Research Tool")
 
@@ -60,16 +61,19 @@ if process_url_button:
     if not urls: # Simplified check for empty list
         placeholder.text("Please enter at least one URL")
     else:
-        # --- THIS IS THE KEY CHANGE: Call process_urls directly ---
+        # --- THIS IS THE KEY CHANGE IN main.py TO FIX THE TypeError ---
+        # Instead of: for status in process_urls(urls):
+        # Just call the function directly:
         placeholder.text("Processing URLs... This may take a moment.")
         process_urls(urls) # Call the function directly
         placeholder.text("URL processing complete! You can now ask questions.")
         # --- END OF KEY CHANGE ---
 
+
 query = placeholder.text_input("Ask a question")
 if query:
     try:
-        # No need to call initialize_components here again, as it's done at the top
+        # initialize_components is already called at the top, so no need here
         answer, sources = generate_answer(query)
         st.header("Answer:")
         st.write(answer)
