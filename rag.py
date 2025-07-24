@@ -13,6 +13,7 @@ from langchain_groq import ChatGroq
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 
 ##load_dotenv()
+import os
 
 
 # Constants
@@ -29,6 +30,7 @@ def initialize_components():
     global llm, vector_store
 
     if llm is None:
+        print(f"DEBUG: GROQ_API_KEY from os.environ.get: {os.environ.get('GROQ_API_KEY')}")
         llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.9, max_tokens=500)
 
     if vector_store is None:
