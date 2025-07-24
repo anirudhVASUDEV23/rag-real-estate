@@ -1,6 +1,6 @@
-import sys
-__import__('pysqlite3')
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# import sys
+# __import__('pysqlite3')
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 from uuid import uuid4
 from dotenv import load_dotenv
@@ -12,7 +12,8 @@ from langchain_chroma import Chroma
 from langchain_groq import ChatGroq
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 
-load_dotenv()
+##load_dotenv()
+
 
 # Constants
 CHUNK_SIZE = 1000
