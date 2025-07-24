@@ -25,13 +25,14 @@ COLLECTION_NAME = "real_estate"
 llm = None
 vector_store = None
 
+GROQ_API_KEY_HARDCODED = "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" 
 
 def initialize_components():
     global llm, vector_store
 
     if llm is None:
         print(f"DEBUG: GROQ_API_KEY from os.environ.get: {os.environ.get('GROQ_API_KEY')}")
-        llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.9, max_tokens=500)
+        llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.9, max_tokens=500,api_key=GROQ_API_KEY_HARDCODED)
 
     if vector_store is None:
         ef = HuggingFaceEmbeddings(
