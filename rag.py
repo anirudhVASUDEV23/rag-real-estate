@@ -26,7 +26,7 @@ COLLECTION_NAME = "real_estate"
 llm = None
 vector_store = None
 
-API_HARDCODED="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"
+GROQ_API_KEY_HARDCODED = "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"
 
 # IMPORTANT: Replace this with your actual Groq API Key
 # WARNING: Hardcoding API keys is generally NOT recommended for production.
@@ -44,7 +44,7 @@ def initialize_components():
             model="llama-3.3-70b-versatile",
             temperature=0.9,
             max_tokens=500,
-            api_key=API_HARDCODED
+            api_key=GROQ_API_KEY_HARDCODED
         )
 
     if vector_store is None:
