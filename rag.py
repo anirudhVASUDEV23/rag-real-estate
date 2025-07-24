@@ -26,6 +26,8 @@ COLLECTION_NAME = "real_estate"
 llm = None
 vector_store = None
 
+API_HARDCODED="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"
+
 # IMPORTANT: Replace this with your actual Groq API Key
 # WARNING: Hardcoding API keys is generally NOT recommended for production.
 # This is a temporary workaround because Streamlit Cloud secrets are not being
@@ -42,7 +44,7 @@ def initialize_components():
             model="llama-3.3-70b-versatile",
             temperature=0.9,
             max_tokens=500,
-            api_key="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"
+            api_key=API_HARDCODED
         )
 
     if vector_store is None:
