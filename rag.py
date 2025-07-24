@@ -42,7 +42,7 @@ def initialize_components():
             model="llama-3.3-70b-versatile",
             temperature=0.9,
             max_tokens=500,
-          
+            api_key="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"
         )
 
     if vector_store is None:
